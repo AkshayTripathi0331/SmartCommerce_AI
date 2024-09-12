@@ -1,0 +1,57 @@
+# Python specific
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.env
+*.venv
+ENV/
+env/
+venv/
+.venv/
+*.egg-info
+.eggs/
+*.egg
+
+# Pytest cache and coverage
+.pytest_cache/
+.coverage
+.tox/
+
+# Virtual environments
+pip-log.txt
+pip-delete-this-directory.txt
+
+# MySQL/MongoDB or other database dumps
+*.sql
+*.sqlite
+*.db
+*.db-journal
+
+# Ignore any secret files
+.env
+*.env
+
+# Ignore compiled Python files
+*.pyc
+
+# Ignore IDE/Editor-specific files
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Dependency directories
+node_modules/
+npm-debug.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Docker related
+docker-compose.override.yml
+
+# Ignore coverage reports
+htmlcov/
