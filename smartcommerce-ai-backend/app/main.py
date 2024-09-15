@@ -20,7 +20,19 @@ app.add_middleware(
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # In-memory user storage (for now)
-fake_db = {}
+fake_db = {
+    "testuser": {
+        "email": "testuser@example.com",
+        "password": pwd_context.hash("testpassword")  # Hashed password
+    }
+}
+
+# Initial fake products
+products_db = {
+    1: Product(name="Laptop", description="A high-performance laptop", price=999.99, stock=10),
+    2: Product(name="Smartphone", description="A latest model smartphone", price=799.99, stock=25),
+    3: Product(name="Headphones", description="Noise-cancelling over-ear headphones", price=199.99, stock=15),
+}
 
 def get_password_hash(password):
     return pwd_context.hash(password)
@@ -49,8 +61,6 @@ def login(user: UserLogin):
     
     return {"message": "Login successful"}
 
-# In-memory product storage (for now)
-products_db = {}
 
 @app.post("/products/", response_model=Product)
 def create_product(product: Product):
