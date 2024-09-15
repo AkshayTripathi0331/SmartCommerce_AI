@@ -1,16 +1,4 @@
-import localFont from "next/font/local";
-import "./globals.css";
-
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+import "../input.css"; // Tailwind CSS stylesheet
 
 export const metadata = {
   title: "Create Next App",
@@ -19,12 +7,22 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
-    </html>
+    <>
+      <html lang="en">
+        <head>
+          <title>SmartCommerce AI</title>
+          <meta name="description" content="SmartCommerce AI" />
+          <link rel="icon" href="/favicon.ico" />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <meta name="robots" content="index, follow" />
+          <link rel="manifest" href="/manifest.json" />
+          <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+          <meta name="theme-color" content="#ffffff" />
+        </head>
+        <body>
+          {children}
+        </body>
+      </html>
+    </>
   );
 }
