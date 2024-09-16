@@ -4,8 +4,24 @@ from pydantic import BaseModel
 from typing import List
 from app.models import UserCreate, UserLogin, Product  
 from fastapi.middleware.cors import CORSMiddleware
+from jose import JWTError, jwt
+from datetime import datetime, timedelta
 
 app = FastAPI()
+
+SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+def create_access_token(data: dict, expires_delta: timedelta = None):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
 
 # Allow your frontend (Next.js)
 app.add_middleware(
@@ -44,11 +60,14 @@ def verify_password(plain_password, hashed_password):
 def register(user: UserCreate):
     if user.username in fake_db:
         raise HTTPException(status_code=400, detail="Username already registered")
-    
+
     hashed_password = get_password_hash(user.password)
     fake_db[user.username] = {"email": user.email, "password": hashed_password}
-    
-    return {"message": "User registered successfully"}
+
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(data={"sub": user.username}, expires_delta=access_token_expires)
+
+    return {"message": "User registered successfully", "access_token": access_token, "token_type": "bearer"}
 
 @app.post("/login")
 def login(user: UserLogin):

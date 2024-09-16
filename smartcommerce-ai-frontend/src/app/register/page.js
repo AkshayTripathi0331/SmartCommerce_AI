@@ -1,27 +1,32 @@
 "use client";
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 const Register = () => {
+  const router = useRouter();
   const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    const user = { username, password, email };
 
     const response = await fetch('http://127.0.0.1:8000/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ username, email, password }),
+      body: JSON.stringify(user),
     });
 
-    const data = await response.json();
     if (response.ok) {
-      alert('User registered successfully!');
+      const data = await response.json();
+      localStorage.setItem('token', data.access_token);
+      alert('Registration successful!');
+      router.push('/products');
     } else {
-      alert(data.detail);
+      alert('Registration failed.');
     }
   };
 
