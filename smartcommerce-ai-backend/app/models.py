@@ -15,3 +15,20 @@ class Product(BaseModel):
     description: str
     price: float
     stock: int
+
+class UserProfile(BaseModel):
+    username: str
+    email: str
+    full_name: str = None
+    address: str = None
+    phone_number: str = None
+
+class Order(BaseModel):
+    product_id: int
+    product_name: str
+    quality:int 
+    total_price: float
+    order_date: str
+
+class UserWithOrders(UserProfile):
+    orders: List[Order]

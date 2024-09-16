@@ -7,13 +7,21 @@ from fastapi.middleware.cors import CORSMiddleware
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = FastAPI()
 
-SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+# Get environment variables
+SECRET_KEY = os.getenv("SECRET_KEY")
+print(SECRET_KEY)
+ALGORITHM = os.getenv("ALGORITHM")
+print(ALGORITHM)
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
@@ -52,6 +60,9 @@ products_db = {
     3: Product(name="Headphones", description="Noise-cancelling over-ear headphones", price=199.99, stock=15),
 }
 
+profiles_db = {}
+orders_db = {}
+
 def get_password_hash(password):
     return pwd_context.hash(password)
 
@@ -65,6 +76,14 @@ def register(user: UserCreate):
 
     hashed_password = get_password_hash(user.password)
     fake_db[user.username] = {"email": user.email, "password": hashed_password}
+
+    profiles_db[user.username] = {
+        "username": user.username,
+        "email": user.email,
+        "full_name": None,
+        "address": None,
+        "phone_number": None
+    }
 
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(data={"sub": user.username}, expires_delta=access_token_expires)
@@ -80,8 +99,10 @@ def login(user: UserLogin):
     if not verify_password(user.password, hashed_password):
         raise HTTPException(status_code=400, detail="Invalid username or password")
     
-    return {"message": "Login successful"}
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(data={"sub": user.username}, expires_delta=access_token_expires)
 
+    return {"message": "Login successful", "access_token": access_token, "token_type": "bearer"}
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
@@ -103,7 +124,7 @@ def verify_token(token: str = Depends(oauth2_scheme)):
 @app.post("/products/", response_model=Product)
 def create_product(product: Product, token: str = Depends(verify_token)):
     product_id = len(products_db) + 1
-    products_db[product_id] = product
+    products_db[product_id] = product.copy()  # Prevents reference issues
     return product
 
 @app.get("/products/", response_model=List[Product])
@@ -121,9 +142,8 @@ def read_product(product_id: int):
 def update_product(product_id: int, product: Product, token: str = Depends(verify_token)):
     if product_id not in products_db:
         raise HTTPException(status_code=404, detail="Product not found")
-    products_db[product_id] = product
+    products_db[product_id] = product.copy()  # Prevents reference issues
     return product
-
 
 @app.delete("/products/{product_id}")
 def delete_product(product_id: int, token: str = Depends(verify_token)):
@@ -131,3 +151,49 @@ def delete_product(product_id: int, token: str = Depends(verify_token)):
         raise HTTPException(status_code=404, detail="Product not found")
     del products_db[product_id]
     return {"message": "Product deleted"}
+
+
+# Endpoint to view user profile
+@app.get("/profile/", response_model=UserProfile)
+def get_profile(token: str = Depends(verify_token)):
+    username = verify_token(token)
+    profile = profiles_db.get(username)
+    if not profile:
+        raise HTTPException(status_code=404, detail="Profile not found")
+    return profile
+
+# Endpoint to update user profile
+@app.put("/profile/")
+def update_profile(updated_profile: UserProfile, token: str = Depends(verify_token)):
+    username = verify_token(token)
+    if username not in profiles_db:
+        raise HTTPException(status_code=404, detail="Profile not found")
+    
+    profiles_db[username] = updated_profile.dict()
+    return {"message": "Profile updated successfully"}
+
+# Endpoint to view order history
+@app.get("/orders/", response_model=List[Order])
+def get_order_history(token: str = Depends(verify_token)):
+    username = verify_token(token)
+    return orders_db.get(username, [])
+
+# Simulate order placement in backend for testing
+@app.post("/orders/")
+def create_order(token: str = Depends(verify_token)):
+    username = verify_token(token)
+    
+    if username not in orders_db:
+        orders_db[username] = []
+    
+    order = Order(
+        order_id=len(orders_db[username]) + 1,
+        product_name="Example Product",
+        quantity=1,
+        total_price=99.99,
+        order_date="2024-09-15"
+    )
+    
+    orders_db[username].append(order)
+    
+    return {"message": "Order created successfully"}
