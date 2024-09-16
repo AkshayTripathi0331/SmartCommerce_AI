@@ -6,6 +6,8 @@ from app.models import UserCreate, UserLogin, Product
 from fastapi.middleware.cors import CORSMiddleware
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
+from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
 
 app = FastAPI()
 
@@ -81,8 +83,25 @@ def login(user: UserLogin):
     return {"message": "Login successful"}
 
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+
+def verify_token(token: str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=401,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+        return username
+    except JWTError:
+        raise credentials_exception
+
 @app.post("/products/", response_model=Product)
-def create_product(product: Product):
+def create_product(product: Product, token: str = Depends(verify_token)):
     product_id = len(products_db) + 1
     products_db[product_id] = product
     return product
@@ -99,14 +118,15 @@ def read_product(product_id: int):
     return product
 
 @app.put("/products/{product_id}", response_model=Product)
-def update_product(product_id: int, product: Product):
+def update_product(product_id: int, product: Product, token: str = Depends(verify_token)):
     if product_id not in products_db:
         raise HTTPException(status_code=404, detail="Product not found")
     products_db[product_id] = product
     return product
 
+
 @app.delete("/products/{product_id}")
-def delete_product(product_id: int):
+def delete_product(product_id: int, token: str = Depends(verify_token)):
     if product_id not in products_db:
         raise HTTPException(status_code=404, detail="Product not found")
     del products_db[product_id]
