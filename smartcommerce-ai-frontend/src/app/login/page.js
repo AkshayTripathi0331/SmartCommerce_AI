@@ -1,26 +1,31 @@
 "use client";
+
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 const Login = () => {
+  const router = useRouter();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    const user = { username, password };
 
     const response = await fetch('http://127.0.0.1:8000/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify(user),
     });
 
-    const data = await response.json();
     if (response.ok) {
-      alert('Login successful!');
+      const data = await response.json();
+      localStorage.setItem('token', data.token);
+      router.push('/products');
     } else {
-      alert(data.detail);
+      alert('Invalid username or password');
     }
   };
 

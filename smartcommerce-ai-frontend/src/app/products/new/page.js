@@ -1,11 +1,20 @@
 "use client";
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
 const NewProduct = () => {
+  const router = useRouter();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState(0);
   const [stock, setStock] = useState(0);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/login');
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
