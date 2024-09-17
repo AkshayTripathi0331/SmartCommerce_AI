@@ -22,6 +22,7 @@ const Login = () => {
 
     if (response.ok) {
       const data = await response.json();
+      console.log(data.token);
       localStorage.setItem('token', data.token);
       router.push('/products');
     } else {

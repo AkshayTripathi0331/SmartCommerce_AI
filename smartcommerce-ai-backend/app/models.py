@@ -32,3 +32,10 @@ class Order(BaseModel):
 
 class UserWithOrders(UserProfile):
     orders: List[Order]
+
+class CartItem(BaseModel):
+    product_id: int
+    quantity: int
+
+class Cart(BaseModel):
+    items: List[CartItem]

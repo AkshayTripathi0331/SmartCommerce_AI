@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const NewProduct = () => {
   const router = useRouter();
@@ -8,13 +8,18 @@ const NewProduct = () => {
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState(0);
   const [stock, setStock] = useState(0);
+  const [token, setToken] = useState('');
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      router.push('/login');
+    const storedToken = localStorage.getItem('token');
+    if (!storedToken) {
+      router.push('/login'); // Redirect to login if token is not available
+    } else {
+      setToken(storedToken); // Set the token in state
     }
-  }, []);
+
+    console.log("token",token);
+  }, [router]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

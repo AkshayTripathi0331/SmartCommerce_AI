@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from passlib.context import CryptContext
 from pydantic import BaseModel
 from typing import List
-from app.models import UserCreate, UserLogin, Product  
+from app.models import UserCreate, UserLogin, Product, UserProfile, Order, UserWithOrders, CartItem, Cart
 from fastapi.middleware.cors import CORSMiddleware
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
@@ -197,3 +197,55 @@ def create_order(token: str = Depends(verify_token)):
     orders_db[username].append(order)
     
     return {"message": "Order created successfully"}
+
+# Fake storage for carts (for now)
+carts_db = {}
+
+# Checkout endpoint
+@app.post("/checkout/")
+def checkout(cart: Cart, token: str = Depends(verify_token)):
+    username = verify_token(token)
+    
+    if username not in profiles_db:
+        raise HTTPException(status_code=404, detail="User profile not found")
+    
+    if username not in orders_db:
+        orders_db[username] = []
+    
+    total_price = 0
+    order_items = []
+
+    for item in cart.items:
+        product = products_db.get(item.product_id)
+        if not product:
+            raise HTTPException(status_code=404, detail=f"Product with ID {item.product_id} not found")
+        if product.stock < item.quantity:
+            raise HTTPException(status_code=400, detail=f"Insufficient stock for product {product.name}")
+        
+        total_price += product.price * item.quantity
+        product.stock -= item.quantity
+
+        # Prepare order item
+        order_items.append({
+            "product_name": product.name,
+            "quantity": item.quantity,
+            "total_price": product.price * item.quantity
+        })
+    
+    # Create order
+    order_id = len(orders_db[username]) + 1
+    order = Order(
+        order_id=order_id,
+        product_name=", ".join([item["product_name"] for item in order_items]),
+        quantity=sum([item["quantity"] for item in order_items]),
+        total_price=total_price,
+        order_date=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    )
+
+    orders_db[username].append(order)
+
+    # Clear the cart after checkout
+    if username in carts_db:
+        del carts_db[username]
+
+    return {"message": "Order created successfully", "order": order}
