@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from fastapi.security import OAuth2PasswordBearer
+from app.email_service import send_order_confirmation_email
 from dotenv import load_dotenv
 import os
 
@@ -225,14 +226,12 @@ def checkout(cart: Cart, token: str = Depends(verify_token)):
         total_price += product.price * item.quantity
         product.stock -= item.quantity
 
-        # Prepare order item
         order_items.append({
             "product_name": product.name,
             "quantity": item.quantity,
             "total_price": product.price * item.quantity
         })
     
-    # Create order
     order_id = len(orders_db[username]) + 1
     order = Order(
         order_id=order_id,
@@ -244,8 +243,8 @@ def checkout(cart: Cart, token: str = Depends(verify_token)):
 
     orders_db[username].append(order)
 
-    # Clear the cart after checkout
-    if username in carts_db:
-        del carts_db[username]
+    # Send order confirmation email
+    user_email = fake_db[username]["email"]
+    send_order_confirmation_email(user_email, order)
 
     return {"message": "Order created successfully", "order": order}

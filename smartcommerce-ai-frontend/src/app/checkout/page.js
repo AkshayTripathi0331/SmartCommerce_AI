@@ -14,6 +14,12 @@ const CheckoutPage = () => {
 
   const handleCheckout = async () => {
     const token = localStorage.getItem('token');
+
+    if (!token) {
+      alert('Please log in to proceed with checkout.');
+      return;
+    }
+
     const response = await fetch('http://127.0.0.1:8000/checkout/', {
       method: 'POST',
       headers: {
@@ -27,9 +33,9 @@ const CheckoutPage = () => {
       const data = await response.json();
       setOrder(data.order);
       localStorage.removeItem('cart');  // Clear the cart after checkout
-      alert('Checkout successful!');
+      alert('Checkout successful! A confirmation email has been sent.');
     } else {
-      alert('Checkout failed.');
+      alert('Checkout failed. Please try again.');
     }
   };
 

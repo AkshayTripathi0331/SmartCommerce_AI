@@ -18,6 +18,21 @@ export default function Home() {
       <Link href="/products/new">
         <p className="text-blue-500 mb-4">Create New Product</p>
       </Link>
+      <Link href="/profile">
+        <p className="text-blue-500 mb-4">Profile</p>
+      </Link>
+      <Link href="/cart">
+        <p className="text-blue-500 mb-4">Cart</p>
+      </Link>
+      <Link href="/orders">
+        <p className="text-blue-500 mb-4">Orders</p>
+      </Link>
+      <Link href="/checkout">
+        <p className="text-blue-500 mb-4">Checkout</p>
+      </Link>
+      <Link href="/logout">
+        <p className="text-blue-500 mb-4">Logout</p>
+      </Link>
     </div>
   );
 }
