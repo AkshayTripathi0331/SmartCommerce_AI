@@ -25,6 +25,46 @@
 
 ## 🏗️ Architecture
 
+(For a high-level overview, see the component diagram above.)
+
+## 🧠 AI Architecture & Flow
+
+The SmartCommerce AI Assistant ("Smarty") uses a sophisticated agentic loop to handle user requests, ranging from semantic product discovery to complex cart management.
+
+```mermaid
+graph TD
+    A[User Message] --> B[FastAPI /api/v1/chat]
+    B --> C{ShoppingAgent}
+    
+    subgraph AI Provider Layer
+        C --> D[Gemini 2.0 Flash]
+        C --> E[Ollama - Llama 3.2]
+    end
+
+    C --> F[System Prompt & History]
+    F --> G{Tool Call Needed?}
+    
+    G -- Yes --> H[AgentTools Execution]
+    H --> I[Product Search - Qdrant]
+    H --> J[Policy RAG - Qdrant]
+    H --> K[Cart/Order Operations]
+    
+    I --> L[Tool Results]
+    J --> L
+    K --> L
+    
+    L --> F
+    G -- No --> M[Final Human Response]
+    M --> N[JSON Clean-up & Formatting]
+    N --> O[User]
+```
+
+### Key AI Components:
+- **Multi-Provider Support**: Switch between **Google Gemini** (cloud) and **Ollama** (local) via `.env`.
+- **Hybrid Search**: Combines traditional filtering with **Vector Embeddings** (text-embedding-004) for semantic matching.
+- **RAG System**: Policy questions (returns, shipping) are answered by chunking documents and performing similarity search in Qdrant.
+- **Tool-Calling Loop**: Uses a recursive loop (up to 5 turns) to ensure complex requests (search -> details -> add) are handled in a single message turn.
+
 ```
 ┌────────────────┐     ┌────────────────┐     ┌────────────────┐
 │   Next.js 14   │────▶│   FastAPI      │────▶│  PostgreSQL    │
