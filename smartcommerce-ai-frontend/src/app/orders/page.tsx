@@ -109,7 +109,7 @@ export default function OrdersPage() {
                                     </p>
                                 </div>
                                 <div className="flex items-center gap-4">
-                                    <span className="text-xl font-bold text-primary-600">${order.total.toFixed(2)}</span>
+                                    <span className="text-xl font-bold text-primary-600">${Number(order.total).toFixed(2)}</span>
                                     <FiChevronRight className="w-5 h-5 text-gray-400" />
                                 </div>
                             </div>

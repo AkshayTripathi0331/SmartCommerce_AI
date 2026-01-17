@@ -26,7 +26,8 @@ async def get_or_create_cart(db, user_id: UUID) -> Cart:
         cart = Cart(user_id=user_id)
         db.add(cart)
         await db.flush()
-        await db.refresh(cart)
+        # Recursive call to fetch with all relationships loaded
+        return await get_or_create_cart(db, user_id)
     
     return cart
 

@@ -46,12 +46,20 @@
 
 ## 🚀 Quick Start
 
-### Prerequisites
-- Docker & Docker Compose
-- Node.js 18+
-- Google Gemini API Key
+### Helper Tools
+- **Docker Desktop** (Required for containerization)
+- **Node.js 18+** (For local frontend development)
+- **Ollama** (Optional: For free, local AI models)
 
-### 1. Clone & Configure
+### 1. Setup Local AI (Optional)
+If you want to use the free **Llama 3.2** model instead of Google Gemini:
+```bash
+cd smartcommerce-ai-backend
+chmod +x scripts/setup_ollama.sh
+./scripts/setup_ollama.sh
+```
+
+### 2. Start the Application
 
 ```bash
 cd SmartCommerce_AI
@@ -73,6 +81,12 @@ docker-compose up -d
 docker-compose exec api python scripts/seed_products.py
 docker-compose exec api python scripts/index_vectors.py
 docker-compose exec api python scripts/index_policies.py
+
+# 3. Verify AI Bot (Optional)
+Run the automated test suite to verify the AI assistant:
+```bash
+python3 scripts/test_bot.py
+```
 ```
 
 ### 3. Start Frontend

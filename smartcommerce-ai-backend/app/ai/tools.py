@@ -291,7 +291,7 @@ class AgentTools:
 TOOL_DEFINITIONS = [
     {
         "name": "search_products",
-        "description": "Search for products in the catalog. Use this when the user is looking for products or asking about what's available.",
+        "description": "Search for products in the store's catalog. Use this when the user asks 'what do you have?', 'search for X', or 'find Y'.",
         "parameters": {
             "type": "object",
             "properties": {
@@ -328,7 +328,7 @@ TOOL_DEFINITIONS = [
             "properties": {
                 "product_id": {
                     "type": "string",
-                    "description": "The product UUID"
+                    "description": "The product UUID string (copy exactly from search results)"
                 }
             },
             "required": ["product_id"]
@@ -342,7 +342,7 @@ TOOL_DEFINITIONS = [
             "properties": {
                 "product_id": {
                     "type": "string",
-                    "description": "The product UUID to add"
+                    "description": "The product UUID string to add (copy exactly from search results)"
                 },
                 "quantity": {
                     "type": "integer",
@@ -386,7 +386,7 @@ TOOL_DEFINITIONS = [
     },
     {
         "name": "lookup_policy",
-        "description": "Look up store policies about shipping, returns, refunds, or terms of service.",
+        "description": "Look up official store policies regarding shipping, returns, refunds, or terms. Use this for ANY question about 'how do I return' or 'how long is shipping'.",
         "parameters": {
             "type": "object",
             "properties": {

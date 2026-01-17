@@ -45,7 +45,8 @@ def decode_access_token(token: str) -> dict:
             algorithms=[settings.jwt_algorithm]
         )
         return payload
-    except JWTError:
+    except JWTError as e:
+        print(f"DEBUG: JWT Validation Error: {e}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",

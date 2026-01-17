@@ -65,6 +65,11 @@ export function ChatWidget() {
                     ...prev,
                     { role: 'assistant', content: data.response },
                 ])
+            } else if (response.status === 401) {
+                setMessages((prev) => [
+                    ...prev,
+                    { role: 'assistant', content: 'Your session has expired. Please log in again to continue chatting! 🔐' },
+                ])
             } else {
                 throw new Error('Failed to get response')
             }
@@ -148,8 +153,8 @@ export function ChatWidget() {
                             >
                                 <div
                                     className={`max-w-[80%] rounded-2xl px-4 py-2 ${message.role === 'user'
-                                            ? 'bg-primary-600 text-white rounded-br-md'
-                                            : 'bg-gray-100 text-gray-800 rounded-bl-md'
+                                        ? 'bg-primary-600 text-white rounded-br-md'
+                                        : 'bg-gray-100 text-gray-800 rounded-bl-md'
                                         }`}
                                 >
                                     <ReactMarkdown

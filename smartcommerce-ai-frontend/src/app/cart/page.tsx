@@ -145,7 +145,7 @@ export default function CartPage() {
                             {/* Details */}
                             <div className="flex-1 min-w-0">
                                 <h3 className="font-semibold text-gray-900 truncate">{item.product_name}</h3>
-                                <p className="text-primary-600 font-medium">${item.product_price.toFixed(2)}</p>
+                                <p className="text-primary-600 font-medium">${Number(item.product_price).toFixed(2)}</p>
                             </div>
 
                             {/* Quantity */}
@@ -169,7 +169,7 @@ export default function CartPage() {
 
                             {/* Subtotal & Remove */}
                             <div className="text-right">
-                                <p className="font-bold text-gray-900">${item.subtotal.toFixed(2)}</p>
+                                <p className="font-bold text-gray-900">${Number(item.subtotal).toFixed(2)}</p>
                                 <button
                                     onClick={() => removeItem(item.id)}
                                     disabled={updating === item.id}
@@ -189,7 +189,7 @@ export default function CartPage() {
                     <div className="space-y-2 mb-4">
                         <div className="flex justify-between text-gray-600">
                             <span>Subtotal ({cart.item_count} items)</span>
-                            <span>${cart.total.toFixed(2)}</span>
+                            <span>${Number(cart.total).toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between text-gray-600">
                             <span>Shipping</span>
@@ -200,7 +200,7 @@ export default function CartPage() {
                     <div className="border-t pt-4 mb-6">
                         <div className="flex justify-between text-xl font-bold">
                             <span>Total</span>
-                            <span className="text-primary-600">${cart.total.toFixed(2)}</span>
+                            <span className="text-primary-600">${Number(cart.total).toFixed(2)}</span>
                         </div>
                     </div>
 

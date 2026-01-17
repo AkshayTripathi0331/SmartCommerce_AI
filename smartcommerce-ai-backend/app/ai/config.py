@@ -9,7 +9,14 @@ class AISettings(BaseSettings):
     google_api_key: str = ""
     embedding_model: str = "models/text-embedding-004"
     embedding_dimensions: int = 768  # Gemini embedding dimensions
-    chat_model: str = "gemini-2.0-flash"
+    chat_model: str = "gemini-1.5-flash"
+    
+    # Provider Selection
+    ai_provider: str = "gemini"  # "gemini" or "ollama"
+    
+    # Ollama Settings
+    ollama_base_url: str = "http://host.docker.internal:11434/v1"  # Access host's Ollama from container
+    ollama_model: str = "llama3.2"
     
     # Qdrant
     qdrant_url: str = "http://localhost:6333"
