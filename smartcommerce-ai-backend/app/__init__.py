@@ -1,0 +1,1 @@
+"""SmartCommerce AI Backend Application."""
